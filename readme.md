@@ -35,3 +35,19 @@ a simple study app that allows students to practice recalling information using 
 - [x] User gets an error if they try to create a new flashcard with no question or answer
 - [x] User can edit existing flashcard
 - [x] User can add multiple choice answers in the creation screen
+
+📝 `NOTE` Paste this template at the top of your existing `README.md` file from the last lab.
+
+## Lab 3
+
+### App Walk-though
+<img src="lab3.gif" width=200><br>
+
+## Required
+- [x] User can browse through multiple flashcards
+- [x] User can re-open the app and see previously created flashcards
+- [x] Push code to GitHub
+## Optional
+- [ ] User can delete a flashcard
+- [ ] User can edit existing flashcard
+- [ ] User can store multiple choice questions
