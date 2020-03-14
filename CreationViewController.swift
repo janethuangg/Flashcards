@@ -61,8 +61,19 @@ class CreationViewController: UIViewController {
             NSLog("The \"OK\" alert occured.")
             }))
             present(alert, animated: true)
+        } else if (answerText != opt1Text && answerText != opt2Text && answerText != opt3Text){
+            let alert = UIAlertController(title: "Invalid answer", message: "Make sure answer matches one of the options", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
+            NSLog("The \"OK\" alert occured.")
+            }))
+            present(alert, animated: true)
         } else {
-            flashcardsController.updateCard(newQuestion: questionText!, newOpt1: opt1Text!, newOpt2: opt2Text!, newOpt3: opt3Text!, newAnswer: answerText!)
+            var isExisting = false
+            
+            if initialQuestion != nil {
+                isExisting = true
+            }
+            flashcardsController.updateCard(newQuestion: questionText!, newOpt1: opt1Text!, newOpt2: opt2Text!, newOpt3: opt3Text!, newAnswer: answerText!, isExisting: isExisting)
             dismiss(animated: true)
         }
     }

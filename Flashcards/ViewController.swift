@@ -26,23 +26,43 @@ class ViewController: UIViewController {
     @IBOutlet weak var opt3: UIButton!
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var prevButton: UIButton!
+    @IBOutlet weak var deleteButton: UIButton!
+    @IBOutlet weak var editButton: UIButton!
     
     var flashcards = [Flashcard]()
-    var currentIndex = 0
+    var currentIndex = -1
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         readFlashcardsFromDisk()
         
+        card.layer.cornerRadius = 20.0
+        card.layer.shadowRadius = 15.0
+        card.layer.shadowOpacity = 0.2
+        
+        answer.layer.cornerRadius = 20.0
+        question.layer.cornerRadius = 20.0
+        answer.clipsToBounds = true
+        question.clipsToBounds = true
+        
+        updateNextPrevButtons()
+        
         if flashcards.count == 0{
-              updateCard(newQuestion: "What's the capital of Brazil?", newOpt1: "Brasilia", newOpt2: "Rio de Janeiro", newOpt3: "Sao Paulo", newAnswer: "Brasilia")
+            opt1.isHidden = true
+            opt2.isHidden = true
+            opt3.isHidden = true
+            answer.isHidden = true
+            question.isHidden = false
+            deleteButton.isHidden = true
+            editButton.isHidden = true
+            question.text = "create card below"
         } else {
+            currentIndex = 0
+            format()
             updateLabels()
             updateNextPrevButtons()
         }
-        
-        format()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -60,35 +80,31 @@ class ViewController: UIViewController {
     }
 
     @IBAction func didTapCard(_ sender: Any) {
-        if question.isHidden == true {
-            question.isHidden = false
-        } else {
-            question.isHidden = true
+        if flashcards.count != 0 {
+            if question.isHidden == true {
+                question.isHidden = false
+            } else {
+                question.isHidden = true
+            }
         }
     }
     
     func format(){
-        card.layer.cornerRadius = 20.0
-        card.layer.shadowRadius = 15.0
-        card.layer.shadowOpacity = 0.2
-        
-        answer.layer.cornerRadius = 20.0
-        question.layer.cornerRadius = 20.0
-        answer.clipsToBounds = true
-        question.clipsToBounds = true
-        
+        opt1.isHidden = false
         opt1.layer.borderWidth = 3.0
         opt1.layer.borderColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
         opt1.layer.cornerRadius = 20.0
         opt1.layer.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         opt1.setTitleColor(#colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1), for: [])
         
+        opt2.isHidden = false
         opt2.layer.borderWidth = 3.0
         opt2.layer.borderColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
         opt2.layer.cornerRadius = 20.0
         opt2.layer.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         opt2.setTitleColor(#colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1), for: [])
         
+        opt3.isHidden = false
         opt3.layer.borderWidth = 3.0
         opt3.layer.borderColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
         opt3.layer.cornerRadius = 20.0
@@ -96,9 +112,12 @@ class ViewController: UIViewController {
         opt3.setTitleColor(#colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1), for: [])
         
         question.isHidden = false
+        answer.isHidden = false
+        deleteButton.isHidden = false
+        editButton.isHidden = false
     }
     
-    func updateCard(newQuestion: String, newOpt1: String, newOpt2: String, newOpt3: String, newAnswer:String) {
+    func updateCard(newQuestion: String, newOpt1: String, newOpt2: String, newOpt3: String, newAnswer:String, isExisting: Bool) {
         let flashcard = Flashcard(question: newQuestion, answer: newAnswer, opt1: newOpt1, opt2: newOpt2, opt3: newOpt3)
         
         question.text = flashcard.question
@@ -109,30 +128,18 @@ class ViewController: UIViewController {
         
         format()
         
-        flashcards.append(flashcard)
-        print("added new flashcard")
-        print("we now have \(flashcards.count) flashcards")
-        currentIndex = flashcards.count-1
-        print("our current index is \(currentIndex)")
-        
+        if isExisting {
+            flashcards[currentIndex] = flashcard
+        } else {
+            flashcards.append(flashcard)
+            print("added new flashcard")
+            print("we now have \(flashcards.count) flashcards")
+            currentIndex = flashcards.count-1
+            print("our current index is \(currentIndex)")
+        }
         saveFlashcardsToDisk()
         updateNextPrevButtons()
         updateLabels()
-    }
-    
-    func updateNextPrevButtons(){
-        if currentIndex == flashcards.count-1{
-            print("end")
-            nextButton.isEnabled = false
-        } else {
-            nextButton.isEnabled = true
-        }
-        
-        if currentIndex == 0{
-            prevButton.isEnabled = false
-        } else {
-            prevButton.isEnabled = true
-        }
     }
     
     @IBAction func didTapOpt1(_ sender: Any) {
@@ -212,14 +219,80 @@ class ViewController: UIViewController {
         format()
     }
     
-    func updateLabels() {
-        let currentFlashcard = flashcards[currentIndex]
+    @IBAction func didTapDelete(_ sender: Any) {
+        let alert = UIAlertController(title: "Delete flashcard", message: "Are you sure you want to delete this card?", preferredStyle: .actionSheet)
         
-        question.text = currentFlashcard.question
-        answer.text = currentFlashcard.answer
-        opt1.setTitle(currentFlashcard.opt1, for: .normal)
-        opt2.setTitle(currentFlashcard.opt2, for: .normal)
-        opt3.setTitle(currentFlashcard.opt3, for: .normal)
+        let deleteAction = UIAlertAction(title: "Delete", style: .destructive, handler: {action in self.deleteCurrentCard()})
+        
+        alert.addAction(deleteAction)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
+    }
+    
+    
+    
+    func deleteCurrentCard(){
+        flashcards.remove(at: currentIndex)
+        
+        if currentIndex > flashcards.count - 1{
+            currentIndex = flashcards.count - 1
+        }
+        
+        updateLabels()
+        updateNextPrevButtons()
+        saveFlashcardsToDisk()
+    }
+    
+    
+    func updateLabels() {
+        if currentIndex == -1 {
+            card.layer.cornerRadius = 20.0
+            card.layer.shadowRadius = 15.0
+            card.layer.shadowOpacity = 0.2
+            
+            answer.layer.cornerRadius = 20.0
+            question.layer.cornerRadius = 20.0
+            answer.clipsToBounds = true
+            question.clipsToBounds = true
+            
+            opt1.isHidden = true
+            opt2.isHidden = true
+            opt3.isHidden = true
+            answer.isHidden = true
+            question.isHidden = false
+            deleteButton.isHidden = true
+            editButton.isHidden = true
+            question.text = "create card below"
+        } else {
+            let currentFlashcard = flashcards[currentIndex]
+            question.text = currentFlashcard.question
+            answer.text = currentFlashcard.answer
+            opt1.setTitle(currentFlashcard.opt1, for: .normal)
+            opt2.setTitle(currentFlashcard.opt2, for: .normal)
+            opt3.setTitle(currentFlashcard.opt3, for: .normal)
+        }
+    }
+    
+    func updateNextPrevButtons(){
+        if currentIndex == -1 {
+            print("working")
+            prevButton.isEnabled = false
+            nextButton.isEnabled = false
+        } else {
+            if currentIndex == flashcards.count-1{
+                nextButton.isEnabled = false
+            } else {
+                nextButton.isEnabled = true
+            }
+            
+            if currentIndex == 0 {
+                prevButton.isEnabled = false
+            } else {
+                prevButton.isEnabled = true
+            }
+        }        
     }
     
     func saveFlashcardsToDisk(){

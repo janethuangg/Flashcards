@@ -44,6 +44,14 @@
                                             <segue destination="IRJ-GB-c0X" kind="show" identifier="EditSegue" id="omj-kE-1wz"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MgS-oq-4iN">
+                                        <rect key="frame" x="16" y="8" width="30" height="30"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="❌"/>
+                                        <connections>
+                                            <action selector="didTapDelete:" destination="BYZ-38-t0r" eventType="touchUpInside" id="7wZ-BJ-9CJ"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <gestureRecognizers/>
@@ -135,6 +143,8 @@
                     <connections>
                         <outlet property="answer" destination="EjL-gD-9Vx" id="7j9-pN-aCj"/>
                         <outlet property="card" destination="UAc-We-jwz" id="Epi-8g-tl1"/>
+                        <outlet property="deleteButton" destination="MgS-oq-4iN" id="jzq-YI-fDM"/>
+                        <outlet property="editButton" destination="Ty2-He-CmC" id="ihl-WA-fld"/>
                         <outlet property="nextButton" destination="1L2-Fe-TpK" id="Eho-Jw-Rgh"/>
                         <outlet property="opt1" destination="kkY-Qq-QGW" id="1Km-OA-cuX"/>
                         <outlet property="opt2" destination="IE8-vF-lTK" id="hbX-Xn-WXY"/>
