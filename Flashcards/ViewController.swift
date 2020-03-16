@@ -45,6 +45,8 @@ class ViewController: UIViewController {
         question.layer.cornerRadius = 20.0
         answer.clipsToBounds = true
         question.clipsToBounds = true
+        question.textColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        answer.textColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         
         updateNextPrevButtons()
         
@@ -65,6 +67,31 @@ class ViewController: UIViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        card.alpha = 0
+        card.transform = CGAffineTransform.identity.scaledBy(x: 0.75, y: 0.75)
+        opt1.alpha = 0
+        opt1.transform = CGAffineTransform.identity.scaledBy(x: 0.75, y: 0.75)
+        opt2.alpha = 0
+        opt2.transform = CGAffineTransform.identity.scaledBy(x: 0.75, y: 0.75)
+        opt3.alpha = 0
+        opt3.transform = CGAffineTransform.identity.scaledBy(x: 0.75, y: 0.75)
+        
+        UIView.animate(withDuration: 0.6, delay: 0.5, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.5, options: [], animations: {
+            self.card.alpha=1
+            self.card.transform = CGAffineTransform.identity
+            
+            self.opt1.alpha=1
+            self.opt1.transform = CGAffineTransform.identity
+            self.opt2.alpha=1
+            self.opt2.transform = CGAffineTransform.identity
+            self.opt3.alpha=1
+            self.opt3.transform = CGAffineTransform.identity
+        })
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let navigationController = segue.destination as! UINavigationController
         let creationController = navigationController.topViewController as! CreationViewController
@@ -82,9 +109,9 @@ class ViewController: UIViewController {
     @IBAction func didTapCard(_ sender: Any) {
         if flashcards.count != 0 {
             if question.isHidden == true {
-                question.isHidden = false
+                UIView.transition(with: card, duration: 0.3, options: .transitionFlipFromLeft, animations: {self.question.isHidden=false})
             } else {
-                question.isHidden = true
+                UIView.transition(with: card, duration: 0.3, options: .transitionFlipFromLeft, animations: {self.question.isHidden=true})
             }
         }
     }
@@ -155,7 +182,7 @@ class ViewController: UIViewController {
             opt3.layer.borderColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
             opt3.setTitleColor(#colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1), for: [])
             
-            question.isHidden = true
+            UIView.transition(with: card, duration: 0.3, options: .transitionFlipFromLeft, animations: {self.question.isHidden=true})
         } else {
             opt1.layer.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
             opt1.layer.borderColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
@@ -176,7 +203,7 @@ class ViewController: UIViewController {
             opt3.layer.borderColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
             opt3.setTitleColor(#colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1), for: [])
             
-            question.isHidden = true
+            UIView.transition(with: card, duration: 0.3, options: .transitionFlipFromLeft, animations: {self.question.isHidden=true})
         } else {
             opt2.layer.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
             opt2.layer.borderColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
@@ -197,7 +224,7 @@ class ViewController: UIViewController {
             opt2.layer.borderColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
             opt2.setTitleColor(#colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1), for: [])
             
-            question.isHidden = true
+            UIView.transition(with: card, duration: 0.3, options: .transitionFlipFromLeft, animations: {self.question.isHidden=true})
         } else {
             opt3.layer.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
             opt3.layer.borderColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
@@ -207,7 +234,7 @@ class ViewController: UIViewController {
     
     @IBAction func didTapNext(_ sender: Any) {
         currentIndex = currentIndex + 1
-        updateLabels()
+        animateCardOutNext()
         updateNextPrevButtons()
         format()
     }
@@ -215,6 +242,7 @@ class ViewController: UIViewController {
     @IBAction func didTapPrev(_ sender: Any) {
         currentIndex = currentIndex - 1
         updateLabels()
+        animateCardOutPrev()
         updateNextPrevButtons()
         format()
     }
@@ -269,10 +297,35 @@ class ViewController: UIViewController {
             let currentFlashcard = flashcards[currentIndex]
             question.text = currentFlashcard.question
             answer.text = currentFlashcard.answer
-            opt1.setTitle(currentFlashcard.opt1, for: .normal)
-            opt2.setTitle(currentFlashcard.opt2, for: .normal)
-            opt3.setTitle(currentFlashcard.opt3, for: .normal)
+            
+            let answers = [currentFlashcard.opt1, currentFlashcard.opt2, currentFlashcard.opt3].shuffled()
+            
+            opt1.setTitle(answers[0], for: .normal)
+            opt2.setTitle(answers[1], for: .normal)
+            opt3.setTitle(answers[2], for: .normal)
         }
+    }
+    
+    func animateCardOutNext(){
+        UIView.animate(withDuration: 0.3, animations: {self.card.transform = CGAffineTransform.identity.translatedBy(x: -300, y: 0)}, completion: {finished in
+            self.updateLabels()
+            self.animateCardInNext()})
+    }
+    
+    func animateCardInNext(){
+        card.transform = CGAffineTransform.identity.translatedBy(x: 300, y: 0)
+        UIView.animate(withDuration: 0.3, animations: {self.card.transform = CGAffineTransform.identity})
+    }
+    
+    func animateCardOutPrev(){
+        UIView.animate(withDuration: 0.3, animations: {self.card.transform = CGAffineTransform.identity.translatedBy(x: 300, y: 0)}, completion: {finished in
+            self.updateLabels()
+            self.animateCardInPrev()})
+    }
+    
+    func animateCardInPrev(){
+        card.transform = CGAffineTransform.identity.translatedBy(x: -300, y: 0)
+        UIView.animate(withDuration: 0.3, animations: {self.card.transform = CGAffineTransform.identity})
     }
     
     func updateNextPrevButtons(){
