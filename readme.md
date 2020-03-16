@@ -55,7 +55,7 @@ a simple study app that allows students to practice recalling information using 
 ## Lab 4
 
 ### App Walk-though
-<img src="lab4.gif" width=200><br>
+<img src="lab4v2.gif" width=200><br>
 
 ## Required
 - [x] User should see the app icon 
