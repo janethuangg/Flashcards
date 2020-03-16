@@ -241,7 +241,6 @@ class ViewController: UIViewController {
     
     @IBAction func didTapPrev(_ sender: Any) {
         currentIndex = currentIndex - 1
-        updateLabels()
         animateCardOutPrev()
         updateNextPrevButtons()
         format()
